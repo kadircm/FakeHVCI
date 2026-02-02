@@ -20,7 +20,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <TargetVersion>Windows10</TargetVersion>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>WindowsKernelModeDriver150</PlatformToolset>
+    <PlatformToolset>WindowsKernelModeDriver152</PlatformToolset>
     <ConfigurationType>Driver</ConfigurationType>
     <DriverTargetPlatforms>Desktop</DriverTargetPlatforms>
   </PropertyGroup>
