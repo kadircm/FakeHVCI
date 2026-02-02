@@ -26,6 +26,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: FakeHVCI-Driver
-        path: |
-          driver/x64/Release/*.sys
-          x64/Release/*.sys
+        path: "**/*.sys"
