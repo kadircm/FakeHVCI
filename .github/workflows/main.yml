@@ -1,10 +1,6 @@
 name: Build-Kernel-Driver
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -17,16 +13,25 @@ jobs:
     - name: MSBuild Kurulumu
       uses: microsoft/setup-msbuild@v2
 
-    - name: Driveri Derle (x64 Release)
-      # driver.vcxproj dosyanın adıyla aynı olmalı. 
-      # Eğer bir klasör içindeyse 'KlasorAdı/driver.vcxproj' şeklinde yazmalısın.
-      run: msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:TargetVersion="Windows10"
+    - name: WDK ve SDK Yollarını Bul
+      shell: pwsh
+      run: |
+        $kitPath = "C:\Program Files (x86)\Windows Kits\10"
+        $sdkVer = (Get-ChildItem "$kitPath\Include" | Where-Object { $_.Name -like "10.*" } | Sort-Object Name -Descending | Select-Object -First 1).Name
+        echo "WDK_PATH=$kitPath" >> $env:GITHUB_ENV
+        echo "WDK_VER=$sdkVer" >> $env:GITHUB_ENV
+        Write-Host "Bulunan SDK Versiyonu: $sdkVer"
+
+    - name: Driveri Derle
+      run: |
+        msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 `
+        /p:AdditionalIncludeDirectories="${{ env.WDK_PATH }}\Include\${{ env.WDK_VER }}\km;${{ env.WDK_PATH }}\Include\${{ env.WDK_VER }}\shared" `
+        /p:AdditionalLibraryDirectories="${{ env.WDK_PATH }}\Lib\${{ env.WDK_VER }}\km\x64"
 
     - name: Bitmis Dosyayı Yukle
       uses: actions/upload-artifact@v4
       with:
-        name: MyCompiledDriver
-        # MSBuild varsayılan olarak x64/Release klasörüne çıktı verir
+        name: FakeHVCI-Driver
         path: |
+          driver/x64/Release/*.sys
           x64/Release/*.sys
-          x64/Release/*.inf
