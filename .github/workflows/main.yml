@@ -1,10 +1,6 @@
 name: Build-Kernel-Driver
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -14,23 +10,21 @@ jobs:
     - name: Kodu Indir
       uses: actions/checkout@v4
 
+    - name: WDK'yı Yukle (Gerekli)
+      # WDK kernel başlık dosyalarını (ntddk.h vb.) sisteme ekler
+      run: choco install windowsdriverkit11 -y
+
     - name: MSBuild Kurulumu
       uses: microsoft/setup-msbuild@v2
 
-    - name: WDK Dosyalarini Listele
-      run: |
-        Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\Include" -Recurse -Filter "ntddk.h" | Select-Object FullName
-
     - name: Driveri Derle
-      # v143 toolset kullanarak 10.0.26100.0 SDK ile derleme yapar
       run: |
-        msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:WindowsTargetPlatformVersion=10.0.26100.0
+        msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:TargetVersion="Windows10"
 
     - name: Bitmis Dosyayi Yukle
       uses: actions/upload-artifact@v4
       with:
-        name: FakeHVCI-Driver-Package
-        # Derlenen sys dosyasını Release klasöründen bulur
+        name: FakeHVCI-Driver
         path: |
           driver/x64/Release/*.sys
           x64/Release/*.sys
