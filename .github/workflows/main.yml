@@ -17,6 +17,10 @@ jobs:
     - name: MSBuild Kurulumu
       uses: microsoft/setup-msbuild@v2
 
+    - name: WDK Dosyalarini Listele
+      run: |
+        Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\Include" -Recurse -Filter "ntddk.h" | Select-Object FullName
+
     - name: Driveri Derle
       # v143 toolset kullanarak 10.0.26100.0 SDK ile derleme yapar
       run: |
