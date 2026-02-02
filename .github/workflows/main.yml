@@ -11,8 +11,15 @@ jobs:
     - name: Kodu Indir
       uses: actions/checkout@v4
 
-    - name: WDK'yı Yukle (Gerekli)
-      # WDK kernel başlık dosyalarını (ntddk.h vb.) sisteme ekler
+    - name: WDK Önbelleğini Kontrol Et
+      id: cache-wdk
+      uses: actions/cache@v4
+      with:
+        path: "C:/Program Files (x86)/Windows Kits/10"
+        key: wdk-10.0.22000.0
+
+    - name: WDK'yı Yukle (Sadece Cache Yoksa)
+      if: steps.cache-wdk.outputs.cache-hit != 'true'
       run: choco install windowsdriverkit11 -y
 
     - name: MSBuild Kurulumu
