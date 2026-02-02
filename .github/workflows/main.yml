@@ -20,7 +20,7 @@ jobs:
     - name: Driveri Derle (x64 Release)
       # driver.vcxproj dosyanın adıyla aynı olmalı. 
       # Eğer bir klasör içindeyse 'KlasorAdı/driver.vcxproj' şeklinde yazmalısın.
-      run: msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v143 /p:TargetVersion="Windows10"
+      run: msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64
 
     - name: Bitmis Dosyayı Yukle
       uses: actions/upload-artifact@v4
