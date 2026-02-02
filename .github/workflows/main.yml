@@ -25,15 +25,16 @@ jobs:
     - name: MSBuild Kurulumu
       uses: microsoft/setup-msbuild@v2
 
-    - name: Driveri Derle
+    - name: Manuel Driver Derleme ve Linkleme
       run: |
-        msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:OutDir=D:\a\FakeHVCI\FakeHVCI\output\ /p:_CheckWindowsSDKInstalled=false
+        # 1. Derleme (Compile) - .obj dosyası oluşturur
+        & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX86\x64\cl.exe" /c /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\km" /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\shared" /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\um" /D _AMD64_ /D _KERNEL_MODE /GS- /Zc:inline /Fo"driver.obj" driver.cpp
 
-    - name: Dosyaları Listele (Kontrol)
-      run: dir D:\a\FakeHVCI\FakeHVCI\output\
+        # 2. Bağlama (Link) - .sys dosyası oluşturur
+        & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX86\x64\link.exe" /NAME:FakeHVCI.sys /DRIVER /SUBSYSTEM:NATIVE /ENTRY:DriverEntry /OUT:"FakeHVCI.sys" /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22000.0\km\x64" ntoskrnl.lib hal.lib driver.obj
 
     - name: Bitmis Dosyayi Yukle
       uses: actions/upload-artifact@v4
       with:
         name: FakeHVCI-Driver
-        path: D:\a\FakeHVCI\FakeHVCI\output\FakeHVCI.sys
+        path: FakeHVCI.sys
