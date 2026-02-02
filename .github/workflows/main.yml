@@ -27,11 +27,20 @@ jobs:
 
     - name: Manuel Driver Derleme ve Linkleme
       run: |
-        # 1. Derleme (Compile) - .obj dosyası oluşturur
-        & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX86\x64\cl.exe" /c /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\km" /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\shared" /I"C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0\um" /D _AMD64_ /D _KERNEL_MODE /GS- /Zc:inline /Fo"driver.obj" driver.cpp
+        # 1. Ortam Değişkenlerini Belirle (Versiyonları loglarından aldım)
+        $MSVC_INC = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\include"
+        $WDK_INC = "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0"
+        $WDK_LIB = "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22000.0"
 
-        # 2. Bağlama (Link) - .sys dosyası oluşturur
-        & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX86\x64\link.exe" /NAME:FakeHVCI.sys /DRIVER /SUBSYSTEM:NATIVE /ENTRY:DriverEntry /OUT:"FakeHVCI.sys" /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22000.0\km\x64" ntoskrnl.lib hal.lib driver.obj
+        # 2. Derleme (Compile)
+        & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX86\x64\cl.exe" `
+        /c /I"$MSVC_INC" /I"$WDK_INC\km" /I"$WDK_INC\shared" /I"$WDK_INC\um" `
+        /D _AMD64_ /D _KERNEL_MODE /GS- /Zc:inline /Fo"driver.obj" driver.cpp
+
+        # 3. Bağlama (Link)
+        & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX86\x64\link.exe" `
+        /DRIVER /SUBSYSTEM:NATIVE /ENTRY:DriverEntry /OUT:"FakeHVCI.sys" `
+        /LIBPATH:"$WDK_LIB\km\x64" ntoskrnl.lib hal.lib driver.obj
 
     - name: Bitmis Dosyayi Yukle
       uses: actions/upload-artifact@v4
