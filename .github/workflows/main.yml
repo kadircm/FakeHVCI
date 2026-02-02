@@ -25,22 +25,24 @@ jobs:
     - name: MSBuild Kurulumu
       uses: microsoft/setup-msbuild@v2
 
-    - name: Manuel Driver Derleme ve Linkleme
+    - name: Manuel Driver Derleme (Kaba Kuvvet)
       run: |
-        # 1. Ortam Değişkenlerini Belirle (Versiyonları loglarından aldım)
+        $MSVC_EXE = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\cl.exe"
+        $LINK_EXE = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\link.exe"
+        $SDK_INC = "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0"
         $MSVC_INC = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\include"
-        $WDK_INC = "C:\Program Files (x86)\Windows Kits\10\Include\10.0.22000.0"
-        $WDK_LIB = "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22000.0"
+        
+        # Tüm yolları tek bir değişkende topla (Önemli!)
+        $ENV:INCLUDE = "$MSVC_INC;$SDK_INC\km;$SDK_INC\shared;$SDK_INC\um;$SDK_INC\ucrt"
+        
+        Write-Host "Derleme basliyor..."
+        & $MSVC_EXE /c /nologo /O2 /D_AMD64_ /D_KERNEL_MODE /GS- /Zc:inline /Fo"driver.obj" driver.cpp
+        
+        if ($LASTEXITCODE -ne 0) { throw "Derleme hatasi!" }
 
-        # 2. Derleme (Compile)
-        & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX86\x64\cl.exe" `
-        /c /I"$MSVC_INC" /I"$WDK_INC\km" /I"$WDK_INC\shared" /I"$WDK_INC\um" `
-        /D _AMD64_ /D _KERNEL_MODE /GS- /Zc:inline /Fo"driver.obj" driver.cpp
-
-        # 3. Bağlama (Link)
-        & "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC\14.44.35207\bin\HostX86\x64\link.exe" `
-        /DRIVER /SUBSYSTEM:NATIVE /ENTRY:DriverEntry /OUT:"FakeHVCI.sys" `
-        /LIBPATH:"$WDK_LIB\km\x64" ntoskrnl.lib hal.lib driver.obj
+        Write-Host "Linkleme basliyor..."
+        $SDK_LIB = "C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22000.0\km\x64"
+        & $LINK_EXE /nologo /DRIVER /SUBSYSTEM:NATIVE /ENTRY:DriverEntry /OUT:"FakeHVCI.sys" /LIBPATH:"$SDK_LIB" ntoskrnl.lib hal.lib driver.obj
 
     - name: Bitmis Dosyayi Yukle
       uses: actions/upload-artifact@v4
