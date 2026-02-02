@@ -29,14 +29,15 @@ jobs:
       run: |
         msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:_CheckWindowsSDKInstalled=false
 
-    - name: Dosyaları Ara (PowerShell Tarzı)
+    - name: Driveri Derle
       run: |
-        Get-ChildItem -Path D:\a\FakeHVCI\FakeHVCI\ -Filter *.sys -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
-        
+        msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:OutDir=D:\a\FakeHVCI\FakeHVCI\output\ /p:_CheckWindowsSDKInstalled=false
+
+    - name: Dosyaları Listele (Kontrol)
+      run: dir D:\a\FakeHVCI\FakeHVCI\output\
+
     - name: Bitmis Dosyayi Yukle
       uses: actions/upload-artifact@v4
       with:
         name: FakeHVCI-Driver
-        path: |
-           **/*.sys
-           **/*.inf
+        path: D:\a\FakeHVCI\FakeHVCI\output\FakeHVCI.sys
