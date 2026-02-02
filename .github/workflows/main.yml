@@ -27,10 +27,6 @@ jobs:
 
     - name: Driveri Derle
       run: |
-        msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:_CheckWindowsSDKInstalled=false
-
-    - name: Driveri Derle
-      run: |
         msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:OutDir=D:\a\FakeHVCI\FakeHVCI\output\ /p:_CheckWindowsSDKInstalled=false
 
     - name: Dosyaları Listele (Kontrol)
