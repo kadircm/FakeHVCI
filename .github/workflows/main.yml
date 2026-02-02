@@ -11,17 +11,22 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Kodu Indir
+      uses: actions/checkout@v4
 
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.1
+    - name: MSBuild Kurulumu
+      uses: microsoft/setup-msbuild@v2
 
-    - name: Build Driver
-      # Proje adın farklıysa 'driver.vcxproj' kısmını ona göre değiştir
-      run: msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64
+    - name: Driveri Derle (x64 Release)
+      # driver.vcxproj dosyanın adıyla aynı olmalı. 
+      # Eğer bir klasör içindeyse 'KlasorAdı/driver.vcxproj' şeklinde yazmalısın.
+      run: msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:TargetVersion="Windows10"
 
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v3
+    - name: Bitmis Dosyayı Yukle
+      uses: actions/upload-artifact@v4
       with:
         name: MyCompiledDriver
-        path: x64/Release/*.sys
+        # MSBuild varsayılan olarak x64/Release klasörüne çıktı verir
+        path: |
+          x64/Release/*.sys
+          x64/Release/*.inf
