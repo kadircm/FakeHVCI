@@ -19,7 +19,7 @@ jobs:
 
     - name: Driveri Derle
       run: |
-        msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:TargetVersion="Windows10"
+        msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64
 
     - name: Bitmis Dosyayi Yukle
       uses: actions/upload-artifact@v4
