@@ -22,8 +22,15 @@ jobs:
       run: |
         msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64 /p:_CheckWindowsSDKInstalled=false
 
+    - name: Dosyaları Listele (Nerede Bu SYS?)
+      run: |
+        dir /s /b *.sys
+
     - name: Bitmis Dosyayi Yukle
       uses: actions/upload-artifact@v4
       with:
         name: FakeHVCI-Driver
-        path: "**/*.sys"
+        # En garantisi budur:
+        path: |
+          D:\a\FakeHVCI\FakeHVCI\**\*.sys
+          **/*.sys
