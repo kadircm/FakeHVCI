@@ -1,0 +1,27 @@
+name: Build-Kernel-Driver
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Build Driver
+      # Proje adın farklıysa 'driver.vcxproj' kısmını ona göre değiştir
+      run: msbuild driver.vcxproj /p:Configuration=Release /p:Platform=x64
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: MyCompiledDriver
+        path: x64/Release/*.sys
